@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/foundation.dart';
 
-
 void main() => runApp(MyApp());
 
 class MyApp extends StatelessWidget {
@@ -39,6 +38,33 @@ class MyHomePage extends StatefulWidget {
 }
 
 class _MyHomePageState extends State<MyHomePage> {
+  List<Widget> passComponents = [
+    PassComponent(TypePassComponent.alphanumeric, 100),
+    PassComponent(TypePassComponent.randomletters, 50),
+    PassComponent(TypePassComponent.uppercaseletters, 60),
+    PassComponent(TypePassComponent.lowercaseletters, 60),
+    PassComponent(TypePassComponent.pin, 60),
+    PassComponent(TypePassComponent.custom, 60),
+  ];
+  var addComponentButton = FlatButton(
+    color: Color.fromARGB(100, 128, 139, 150),
+    onPressed: () {
+      debugPrint("Precionado");
+    },
+    child: Container(
+      child: Flex(
+        children: <Widget>[
+          Icon(Icons.add),
+          Text('Add'),
+        ],
+        direction: Axis.vertical,
+        mainAxisAlignment: MainAxisAlignment.center,
+      ),
+      height: 80,
+      width: 80,
+      alignment: Alignment.center,
+    ),
+  );
   @override
   Widget build(BuildContext context) {
     // This method is rerun every time setState is called, for instance as done
@@ -53,39 +79,26 @@ class _MyHomePageState extends State<MyHomePage> {
         // the App.build method, and use it to set our appbar title.
         title: Text(widget.title),
       ),
-      body: Container(
-        alignment: Alignment.topLeft,
+      body: Padding(
         padding: EdgeInsets.all(15),
-        child: Row(
-          children: <Widget>[
-            FlatButton(
-              color: Color.fromARGB(100, 128, 139, 150),
-              onPressed: () { 
-                debugPrint("Precionado");
-              },
-              child: Container(
-                child: Flex(
-                  children: <Widget>[
-                    Icon(Icons.add),
-                    Text('Add'),
-                  ],
-                  direction: Axis.vertical,
-                  mainAxisAlignment: MainAxisAlignment.center,
-                ),
-                height: 80,
-                width: 60,
-                alignment: Alignment.center,
-              ),
-            ),
-          ],
-          mainAxisAlignment: MainAxisAlignment.start,
+        child: Container(
+          height: 100,
+          child: ListView.separated(
+            scrollDirection: Axis.horizontal,
+            padding: EdgeInsets.all(10),
+            itemCount: passComponents.length + 1,
+            itemBuilder: (BuildContext context, int i) {
+              if (i == passComponents.length) {
+                return addComponentButton;
+              }
+              debugPrint(i.toString());
+              return passComponents[i];
+            },
+            separatorBuilder: (BuildContext context, int index) =>
+                VerticalDivider(),
+          ),
         ),
       ),
-      /* floatingActionButton: FloatingActionButton(
-        tooltip: 'Increment',
-        child: Icon(Icons.add),
-        onPressed: () {},
-      ), */
       floatingActionButton: FloatingActionButton.extended(
         label: Text.rich(TextSpan(
           text: 'Generate',
@@ -101,4 +114,106 @@ class _MyHomePageState extends State<MyHomePage> {
           .centerFloat, // This trailing comma makes auto-formatting nicer for build methods.
     );
   }
+
+  void _addComponent(){
+
+  }
+}
+
+class PassComponent extends StatelessWidget {
+  TypePassComponent typePassComponent;
+  int size;
+  String passwordCharacters = "";
+  Color color;
+  String typeString;
+
+  @override
+  Widget build(BuildContext context) {
+    return FlatButton(
+      color: color,
+      onPressed: () {},
+      child: Center(
+        child: Text(
+          typeString,
+          textAlign: TextAlign.center,
+          style: TextStyle(
+            fontSize: 15,
+          ),
+        ),
+      ),
+    );
+  }
+
+  PassComponent(TypePassComponent typePassComponent, int size) {
+    this.typePassComponent = typePassComponent;
+    this.size = size;
+    _typeInterpreter();
+  }
+  PassComponent.custom(String passwordCharacters, int size) {
+    typePassComponent = TypePassComponent.custom;
+    this.size = size;
+  }
+
+  void _typeInterpreter(){
+    switch (typePassComponent) {
+      case TypePassComponent.alphanumeric:
+        color = Colors.indigo;
+        typeString = 'Alphanumeric';
+        break;
+      case TypePassComponent.randomletters:
+        color = Colors.deepPurple;
+        typeString = 'Random\nletters';
+        break;
+      case TypePassComponent.uppercaseletters:
+        color = Colors.orangeAccent;
+        typeString = 'Uppercase\nletters';
+        break;
+      case TypePassComponent.lowercaseletters:
+        color = Colors.redAccent;
+        typeString = 'Lowercase\nletters';
+        break;
+      case TypePassComponent.pin:
+        color = Colors.purpleAccent;
+        typeString = 'Pin';
+        break;
+      case TypePassComponent.custom:
+        color = Colors.blueGrey;
+        typeString = 'Custom';
+        break;
+    }
+  }
+}
+
+class TestComponent extends StatelessWidget {
+  @override
+  Widget build(BuildContext context) {
+    return FlatButton(
+      color: Color.fromARGB(100, 128, 139, 150),
+      onPressed: () {
+        debugPrint("Precionado");
+      },
+      child: Container(
+        child: Flex(
+          children: <Widget>[
+            Icon(Icons.add),
+            Text('Add'),
+          ],
+          direction: Axis.vertical,
+          mainAxisAlignment: MainAxisAlignment.center,
+        ),
+        height: 80,
+        width: 80,
+        alignment: Alignment.center,
+      ),
+    );
+  }
+}
+
+enum TypePassComponent {
+  randomletters,
+  alphanumeric,
+  uppercaseletters,
+  lowercaseletters,
+  pin,
+  custom,
 }
