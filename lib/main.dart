@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/foundation.dart';
+import 'dart:async';
 
 void main() => runApp(MyApp());
 
@@ -39,32 +40,11 @@ class MyHomePage extends StatefulWidget {
 
 class _MyHomePageState extends State<MyHomePage> {
   List<Widget> passComponents = [
-    PassComponent(TypePassComponent.alphanumeric, 100),
-    PassComponent(TypePassComponent.randomletters, 50),
-    PassComponent(TypePassComponent.uppercaseletters, 60),
-    PassComponent(TypePassComponent.lowercaseletters, 60),
-    PassComponent(TypePassComponent.pin, 60),
-    PassComponent(TypePassComponent.custom, 60),
+    PassComponent(typePassComponent: TypePassComponent.alphanumeric, size: 10),
+    PassComponent(typePassComponent: TypePassComponent.randomletters, size: 50),
+    PassComponent(typePassComponent: TypePassComponent.uppercaseletters, size: 15),
   ];
-  var addComponentButton = FlatButton(
-    color: Color.fromARGB(100, 128, 139, 150),
-    onPressed: () {
-      debugPrint("Precionado");
-    },
-    child: Container(
-      child: Flex(
-        children: <Widget>[
-          Icon(Icons.add),
-          Text('Add'),
-        ],
-        direction: Axis.vertical,
-        mainAxisAlignment: MainAxisAlignment.center,
-      ),
-      height: 80,
-      width: 80,
-      alignment: Alignment.center,
-    ),
-  );
+
   @override
   Widget build(BuildContext context) {
     // This method is rerun every time setState is called, for instance as done
@@ -89,7 +69,7 @@ class _MyHomePageState extends State<MyHomePage> {
             itemCount: passComponents.length + 1,
             itemBuilder: (BuildContext context, int i) {
               if (i == passComponents.length) {
-                return addComponentButton;
+                return AddComponentButton();
               }
               debugPrint(i.toString());
               return passComponents[i];
@@ -115,20 +95,31 @@ class _MyHomePageState extends State<MyHomePage> {
     );
   }
 
-  void _addComponent(){
+  void _addComponent() {}
+}
 
+class PassComponent extends StatefulWidget {
+  TypePassComponent typePassComponent;
+  int size;
+
+  PassComponent({this.typePassComponent, this.size}){
+  }
+
+  @override
+  State<StatefulWidget> createState() {
+    debugPrint('New component');
+    return _PasscomponentState();
   }
 }
 
-class PassComponent extends StatelessWidget {
-  TypePassComponent typePassComponent;
-  int size;
+class _PasscomponentState extends State<PassComponent> {
   String passwordCharacters = "";
   Color color;
   String typeString;
 
   @override
   Widget build(BuildContext context) {
+    _typeInterpreter();
     return FlatButton(
       color: color,
       onPressed: () {},
@@ -143,19 +134,13 @@ class PassComponent extends StatelessWidget {
       ),
     );
   }
-
-  PassComponent(TypePassComponent typePassComponent, int size) {
-    this.typePassComponent = typePassComponent;
-    this.size = size;
-    _typeInterpreter();
-  }
-  PassComponent.custom(String passwordCharacters, int size) {
+  /* PassComponent.custom(String passwordCharacters, int size) {
     typePassComponent = TypePassComponent.custom;
     this.size = size;
-  }
+  } */
 
-  void _typeInterpreter(){
-    switch (typePassComponent) {
+  void _typeInterpreter() {
+    switch (widget.typePassComponent) {
       case TypePassComponent.alphanumeric:
         color = Colors.indigo;
         typeString = 'Alphanumeric';
@@ -184,13 +169,16 @@ class PassComponent extends StatelessWidget {
   }
 }
 
-class TestComponent extends StatelessWidget {
+class AddComponentButton extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return FlatButton(
       color: Color.fromARGB(100, 128, 139, 150),
       onPressed: () {
-        debugPrint("Precionado");
+        debugPrint('fied');
+        PassComponent(typePassComponent: TypePassComponent.pin, size: 20);
+        //_neverSatisfied(context);
+        AddComponentDialog();
       },
       child: Container(
         child: Flex(
@@ -207,11 +195,143 @@ class TestComponent extends StatelessWidget {
       ),
     );
   }
+
+  Future<void> _neverSatisfied(BuildContext context) async {
+    debugPrint('neverSatisfied');
+    return showDialog<void>(
+      context: context,
+      barrierDismissible: false, // user must tap button!
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: Text('Rewind and remember'),
+          content: SingleChildScrollView(
+            child: ListBody(
+              children: <Widget>[
+                Text('You will never be satisfied.'),
+                Text('You\’re like me. I’m never satisfied.'),
+              ],
+            ),
+          ),
+          actions: <Widget>[
+            FlatButton(
+              child: Text('Regret'),
+              onPressed: () {
+                Navigator.of(context).pop();
+              },
+            ),
+          ],
+        );
+      },
+    );
+  }
+}
+
+class AddComponentDialog extends StatefulWidget {
+
+  AddComponentDialog(){
+    debugPrint('tisfied 1');
+  }
+
+  @override
+  State<StatefulWidget> createState() {
+    // TODO: implement createState
+    debugPrint('tisfied 2');
+    return _AddComponentDialog();
+  }
+}
+
+class _AddComponentDialog extends State<AddComponentDialog> {
+  @override
+  Widget build(BuildContext context) {
+    debugPrint('satisfied');
+    return FutureBuilder(
+      future: _neverSatisfied(context),
+      builder: (BuildContext context, AsyncSnapshot snapshot) {
+        if(snapshot.connectionState == ConnectionState.done){
+          return snapshot.data;
+        }else{
+          return CircularProgressIndicator();
+        }
+      },
+    );
+  }
+
+  Future<void> _neverSatisfied(BuildContext context) async {
+    debugPrint('neverSatisfied');
+    return showDialog<void>(
+      context: context,
+      barrierDismissible: false, // user must tap button!
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: Text('Rewind and remember'),
+          content: SingleChildScrollView(
+            child: ListBody(
+              children: <Widget>[
+                Text('You will never be satisfied.'),
+                Text('You\’re like me. I’m never satisfied.'),
+              ],
+            ),
+          ),
+          actions: <Widget>[
+            FlatButton(
+              child: Text('Regret'),
+              onPressed: () {
+                Navigator.of(context).pop();
+              },
+            ),
+          ],
+        );
+      },
+    );
+  }
+
+  /* Future<Widget> _addComponent(BuildContext context) async {
+    List<String> typePassComponentStringValues = [
+      'Alphanumeric',
+      'Random letters',
+      'Uppercase letters',
+      'Lowercase letters',
+      'Pin',
+      'Custom'
+    ];
+    Map<String, TypePassComponent> typePassComponentValues = Map.fromIterables(
+        typePassComponentStringValues.whereType(),
+        TypePassComponent.values.whereType());
+    String dropdownValue = typePassComponentStringValues[0];
+    if (await showDialog(
+        context: context,
+        builder: (BuildContext context) {
+          return SimpleDialog(
+            title: Text('Add password component'),
+            children: <Widget>[
+              DropdownButton(
+                value: dropdownValue,
+                icon: Icon(Icons.keyboard_arrow_down),
+                iconSize: 15,
+                elevation: 16,
+                underline: Divider(),
+                onChanged: (String newValue) {
+                  setState(() {
+                    dropdownValue = newValue;
+                  });
+                },
+                items: typePassComponentStringValues
+                    .map<DropdownMenuItem<String>>((String value) {
+                  return DropdownMenuItem<String>(
+                    value: value,
+                    child: Text(value),
+                  );
+                }).toList(),
+              ),
+            ],
+          );
+        })) {}
+  } */
 }
 
 enum TypePassComponent {
-  randomletters,
   alphanumeric,
+  randomletters,
   uppercaseletters,
   lowercaseletters,
   pin,
